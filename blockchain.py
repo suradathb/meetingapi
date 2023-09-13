@@ -1,6 +1,7 @@
 import datetime
 import json
 import hashlib
+from flask import Flask,jsonify
 
 class Blockchain:
     def __init__(self):
@@ -8,7 +9,6 @@ class Blockchain:
         self.chain=[] #List ที่เก็บ block
         # genesis blockchain
         self.create_block(nonce=1,previous_hash="0")
-        self.create_block(nonce=10,previous_hash="100")
 
     # สร้าง Block ขึ้นมาในระบบ  Blockchain
     def create_block(self,nonce,previous_hash):
@@ -48,9 +48,26 @@ class Blockchain:
                 new_nonce += 1
         return new_nonce
 
+# web server
+app = Flask(__name__)
 # ใช้งาน blockchain
 blockchain = Blockchain()
-# เข้ารหัส block แรก
-print(blockchain.hash(blockchain.chain[0]))
-# เข้ารหัส block สอง
-print(blockchain.hash(blockchain.chain[1]))
+
+# routing
+@app.route('/')
+def hello():
+    return "<h1>Hello Blockchain</h1>"
+
+@app.route('/get_chain')
+def get_chain():
+    response = {
+        "chain":blockchain.chain,
+        "length":len(blockchain.chain)
+    }
+    return jsonify(response),200
+
+# run server
+if __name__ == '__main__':
+    app.run()
+
+
